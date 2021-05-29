@@ -1,27 +1,28 @@
 # frozen_string_literal: true
 
-require 'matrix'
-
+# Represents on game of connect four
 class ConnectFourGame
   attr_accessor :board, :player_ordered_list ### to be checked at the end
 
   def initialize
     @heigth = 7
     @width = 7
-    @board = Array.new(@heigth) {Array.new(@width, nil)} #Array.new(@heigth, Array.new(@width))  
+    @board = Array.new(@heigth) {Array.new(@width, nil)}
     @player_ordered_list = nil
-    # random_player_selection(create_player_array)
   end
 
+  # Create the player array with two players
   def create_player_array
     @player_ordered_list = [Player.new('Player 1', 'O'), Player.new('Player 2', 'X')]
   end
 
+  # Shuffle randomly the player array
   def random_player_selection(seed = nil)
     seed = rand(0..1) if seed.nil?
     @player_ordered_list = @player_ordered_list.rotate if seed == 1
   end
 
+  # Returns an array containing the empty cells. Effectively only used to check if any position remain on the board
   def check_free_positions
     solution_array = []
     @board.each_with_index do |x_array, y_iteration|
@@ -32,50 +33,58 @@ class ConnectFourGame
     solution_array
   end
 
+  # Consumes a checked position and place it on the board
   def place_token(posn)
     x = posn[0]
     y = posn[1]
     @board[y][x] = @player_ordered_list[0].token
   end
 
+  # Acquire player choice X for the position and deduct the Y coordinate, checks the output.
   def acquire_player_choice
     output = [-1, -1]
     until valid_input?(output)
-      puts 'Input x coordinate:'
+      puts "#{@player_ordered_list[0].name} input x coordinate:"
       output[0] = gets.chomp.to_i
       output[1] = find_y_coordinate(output[0])
-      p output
     end
     output
   end
 
+  # Returns the Y coordinate by consuming an X coordinate, check the lowest free Y coordinate on this X point.
   def find_y_coordinate(posn_x)
     @board.each_with_index do |value, index|
       return index if value[posn_x].nil?
     end
+    return -1
   end
 
+  #validate that the output is on the board and free
   def valid_input?(posn)
     x = posn[0]
     y = posn[1]
     x.between?(0, @width) && y.between?(0, @heigth) && @board[y][x].nil?
   end
 
+  # Check if the current player has won
   def player_won?
     token_checked = @player_ordered_list[0].token
     token_sequence = Array.new(4, token_checked)
     tokens_aligned_horizontal?(@board, token_sequence) || tokens_aligned_vertical?(@board, token_sequence) || tokens_aligned_diagonal?(@board, token_sequence)
   end
 
+  # Returns true if there is a horizontal line of token for one player
   def tokens_aligned_horizontal?(matrix, token_sequence)
     matrix.any? { |item| item.each_cons(token_sequence.size).include?(token_sequence) }
   end
 
+  # Returns true if there is a vertical line of token for one player
   def tokens_aligned_vertical?(matrix, token_sequence)
     transposed_matrix = matrix.dup.transpose
     tokens_aligned_horizontal?(transposed_matrix, token_sequence)
   end
 
+  # Returns the diagonals of a matrix
   def diagonals(matrix)
     matrix_proc = (0..matrix.size-4).map do |i|
       (0..matrix.size-1-i).map { |j| matrix[i+j][j] }
@@ -85,6 +94,7 @@ class ConnectFourGame
     end)
   end
 
+  # Rotate a matrix 90°
   def rotate90(matrix)
     ncols = matrix.first.size
     matrix.each_index.with_object([]) do |i,a|
@@ -92,22 +102,24 @@ class ConnectFourGame
     end
   end
 
+  # Returns true if there is a diagonal line of token for one player
   def tokens_aligned_diagonal?(matrix, token_sequence)
     diagonal_matrix = diagonals(matrix)
     diagonal_matrix_opposed = diagonals(rotate90(matrix))
     tokens_aligned_horizontal?(diagonal_matrix, token_sequence) || tokens_aligned_horizontal?(diagonal_matrix_opposed, token_sequence)
   end
 
+  # Switch player
   def switch_player
     @player_ordered_list.rotate!
   end
 
+  # Print board
   def print_board
-    # width = @board.flatten.max.to_s.size+2
-    # puts(@board.transpose.reverse.map { |a| a.map { |i| i.to_s.rjust(width) }.join })
     @board.reverse.each { |r| p r }
   end
 
+  # Main play loop
   def play
     create_player_array
     switch_player
@@ -118,14 +130,11 @@ class ConnectFourGame
       place_token(player_choice)
       print_board
     end
-    if player_won?
-      puts "#{@player_ordered_list[0].name} has won the game!"
-    else
-      puts 'GAME OVER!'
-    end
+    player_won? ? puts("#{@player_ordered_list[0].name} has won the game!") : puts('GAME OVER!')
   end
 end
 
+# Represents a player
 class Player
   attr_reader :name, :token
 
@@ -134,5 +143,3 @@ class Player
     @token = token
   end
 end
-
-ConnectFourGame.new.play
