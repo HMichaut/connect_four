@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative './player'
+
 # Represents on game of connect four
 class ConnectFourGame
   attr_accessor :board, :player_ordered_list ### to be checked at the end
@@ -116,7 +118,17 @@ class ConnectFourGame
 
   # Print board
   def print_board
-    @board.reverse.each { |r| p r }
+    input_board = @board.transpose
+    puts "\n"
+    6.downto(0) do |i|
+      print '    |'
+      input_board.each do |column|
+        column[i].nil? ? print('   ') : print(" #{column[i]} ")
+        print '|'
+      end
+      puts "\n"
+    end
+    puts '      0   1   2   3   4   5   6'
   end
 
   # Main play loop
@@ -131,15 +143,5 @@ class ConnectFourGame
       print_board
     end
     player_won? ? puts("#{@player_ordered_list[0].name} has won the game!") : puts('GAME OVER!')
-  end
-end
-
-# Represents a player
-class Player
-  attr_reader :name, :token
-
-  def initialize(name, token)
-    @name = name
-    @token = token
   end
 end

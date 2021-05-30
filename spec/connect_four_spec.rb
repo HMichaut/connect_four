@@ -88,9 +88,6 @@ describe ConnectFourGame do
   describe '#acquire_player_choice' do
     before do
       allow(new_game).to receive(:valid_input?).and_return(true)
-      # valid_input = '3'
-      # allow(new_game).to receive(:gets).and_return(valid_input)
-      # # allow(new_game).to receive(:gets).and_return(valid_input)
     end
     it 'Check if #valid_input? receive a signal' do
       expect(new_game).to receive(:valid_input?)
@@ -386,33 +383,6 @@ describe ConnectFourGame do
       new_game.switch_player
       solution = new_game.player_ordered_list
       expect(solution).to eq([player_1, player_2])
-    end
-  end
-
-  describe '#play' do
-    xit 'Check if #check_free_positions receive a signal' do
-      expect(new_game).to receive(:check_free_positions)
-      new_game.play
-    end
-    xit 'Check if #place_token receive a signal' do
-      expect(new_game).to receive(:check_free_positions)
-      new_game.play
-    end
-    xit 'Check if #acquire_player_choice receive a signal' do
-      expect(new_game).to receive(:acquire_player_choice)
-      new_game.play
-    end
-    xit 'Check if #player_won? receive a signal' do
-      expect(new_game).to receive(:player_won?)
-      new_game.play
-    end
-    xit 'Check if #switch_player receive a signal' do
-      expect(new_game).to receive(:switch_player)
-      new_game.play
-    end
-    xit 'Check if #print_board receive a signal' do
-      expect(new_game).to receive(:print_board)
-      new_game.play
     end
   end
 end
